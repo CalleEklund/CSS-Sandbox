@@ -1,13 +1,10 @@
 import { type NextPage } from "next";
-
-interface ImockDataEntry {
-    key: string,
-    values: string[],
-    twPrefix: string
-}
+import { useState } from "react";
+import type { ImockDataEntry } from "../../types";
 
 interface Props {
-    details: ImockDataEntry[]
+    details: ImockDataEntry[],
+    configHandler: (arg0: string) => void
 }
 
 /**
@@ -23,16 +20,32 @@ interface Props {
     </select>
  */
 
-const GridDetail: NextPage<Props> = ({ details }) => {
-    console.log(details)
+const GridDetail: NextPage<Props> = ({ details, configHandler }) => {
+    //details.map(e => { return { key: e.twPrefix, value: "" } })
+    const [config, setConfig] = useState({})
+
+    const handleOptionChange = (event: React.FormEvent<HTMLSelectElement>) => {
+        const target = (event.target as HTMLInputElement)
+        console.log('target', target.name, target.value)
+        let output = ""
+        if (details[0]?.key == "red") {
+            output = target.name
+        } else {
+            output = target.name + "-" + target.value
+        }
+
+        configHandler(output)
+    }
+
     return (
         <div className="flex flex-row flex-wrap gap-4">
             {
                 details.map((elem, index) => {
+
                     return (
                         <div key={index}>
                             <label key={index} htmlFor={elem.key}>{elem.key + ":"}</label>
-                            <select id={elem.key}>
+                            <select id={elem.key} name={elem.twPrefix} onChange={handleOptionChange}>
                                 {elem.values.map((option, index) => {
                                     return (<option key={index}>{option}</option>)
                                 })}

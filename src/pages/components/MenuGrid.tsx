@@ -3,16 +3,12 @@ import { useState } from "react";
 import GridDetail from "./GridDetail";
 import GridItem from "./GridItem";
 
-interface ImockDataEntry {
-    key: string,
-    values: string[],
-    twPrefix: string
+import type { ImockData, ImockDataEntry } from "../../types";
+
+interface Props {
+    configHandler: (arg0: string) => void
 }
 
-interface ImockData {
-    group: string,
-    members: ImockDataEntry[]
-}
 
 const mockData: ImockData[] = [
     {
@@ -23,8 +19,11 @@ const mockData: ImockData[] = [
         ]
     },
     {
-        group: 'not implemented',
-        members: []
+        group: 'backgroundcolor',
+        members: [
+            { key: 'red', values: ['none', 'red'], twPrefix: 'bg-red-700' },
+            { key: 'green', values: ['none', 'green'], twPrefix: 'bg-green-700' }
+        ]
     },
     {
         group: 'not implemented',
@@ -32,23 +31,20 @@ const mockData: ImockData[] = [
     }
 ]
 
-const MenuGrid: NextPage = () => {
+const MenuGrid: NextPage<Props> = ({ configHandler }) => {
+
     const [selected, setSelected] = useState<string | null>()
     const [detailsProps, setDetailsProps] = useState<ImockDataEntry[]>()
-    console.log(selected)
 
     const handleSelected = (groupId: string) => {
         setSelected(groupId)
         const obj: ImockData = mockData.find(e => e.group === groupId) as ImockData
         setDetailsProps(obj.members)
-
-
     }
 
     return selected == null ? (
         <div className="flex flex-row flex-wrap gap-4 overflow-y-auto p-2">
             {mockData.map((element, index) => {
-                //return <p key={index}>{element.group}</p>
                 return <GridItem key={index} title={element.group} clickHandler={() => handleSelected(element.group)} />
             })}
 
@@ -56,7 +52,7 @@ const MenuGrid: NextPage = () => {
     ) : (
         <div className="flex p-2">
             <div className="flex-[0.8] border-2 border-black ">
-                <GridDetail details={detailsProps ?? []} />
+                <GridDetail configHandler={configHandler} details={detailsProps ?? []} />
             </div>
             <div className="flex-[0.2] border-2 border-black ">
                 <button onClick={() => { setSelected(null) }}>Go back</button>
